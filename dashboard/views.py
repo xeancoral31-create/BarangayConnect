@@ -5,6 +5,7 @@ from announcements.models import Announcement
 from certificates.models import CertificateRequest
 from complaints.models import Complaint
 from notifications.models import Notification
+from accounts.views import admin_required, resident_required
 
 
 @login_required
@@ -15,11 +16,8 @@ def index(request):
     return redirect('dashboard:resident_dashboard')
 
 
-@login_required
+@admin_required
 def admin_dashboard(request):
-    if not request.user.is_admin():
-        return redirect('dashboard:resident_dashboard')
-
     total_residents = CustomUser.objects.filter(role='resident').count()
     pending_residents = CustomUser.objects.filter(role='resident', account_status='pending').count()
     pending_requests = CertificateRequest.objects.filter(status='pending').count()
@@ -47,11 +45,8 @@ def admin_dashboard(request):
     return render(request, 'dashboard/admin_dashboard.html', context)
 
 
-@login_required
+@resident_required
 def resident_dashboard(request):
-    if not request.user.is_resident():
-        return redirect('dashboard:admin_dashboard')
-
     my_requests = CertificateRequest.objects.filter(resident=request.user)
     pending_requests = my_requests.filter(status='pending').count()
     approved_requests = my_requests.filter(status__in=['approved', 'ready', 'completed']).count()
