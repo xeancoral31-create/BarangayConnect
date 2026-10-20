@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponseForbidden
 from django.core.paginator import Paginator
+from django.views.decorators.http import require_POST
 from .models import CustomUser, BarangayOfficial
 from .forms import (
     RegistrationForm, LoginForm, ProfileUpdateForm, PasswordChangeForm,
@@ -34,7 +35,7 @@ def resident_required(view_func):
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('accounts:login')
-        if not request.user.is_resident():
+        if not request.user.is_resident() or request.user.account_status != 'active' or not request.user.is_active:
             return render(request, 'errors/403.html', status=403)
         return view_func(request, *args, **kwargs)
     return wrapper
@@ -85,6 +86,7 @@ def login_view(request):
 
 
 @login_required
+@require_POST
 def logout_view(request):
     username = request.user.username
     log_activity(request.user, 'Logout', f'User logged out: {username}', request)
@@ -193,6 +195,7 @@ def admin_resident_edit(request, pk):
 
 
 @admin_required
+@require_POST
 def admin_approve_resident(request, pk):
     resident = get_object_or_404(CustomUser, pk=pk, role='resident')
     resident.account_status = 'active'
@@ -210,6 +213,7 @@ def admin_approve_resident(request, pk):
 
 
 @admin_required
+@require_POST
 def admin_reject_resident(request, pk):
     resident = get_object_or_404(CustomUser, pk=pk, role='resident')
     resident.account_status = 'rejected'
@@ -227,6 +231,7 @@ def admin_reject_resident(request, pk):
 
 
 @admin_required
+@require_POST
 def admin_deactivate_resident(request, pk):
     resident = get_object_or_404(CustomUser, pk=pk, role='resident')
     resident.account_status = 'inactive'
@@ -238,6 +243,7 @@ def admin_deactivate_resident(request, pk):
 
 
 @admin_required
+@require_POST
 def admin_restore_resident(request, pk):
     resident = get_object_or_404(CustomUser, pk=pk, role='resident')
     resident.account_status = 'active'
@@ -258,9 +264,9 @@ def admin_restore_resident(request, pk):
 def admin_reset_password(request, pk):
     resident = get_object_or_404(CustomUser, pk=pk, role='resident')
     if request.method == 'POST':
-        new_password = request.POST.get('new_password', 'BarangayConnect@2024')
-        if len(new_password) < 8:
-            messages.error(request, 'Password must be at least 8 characters.')
+        new_password = request.POST.get('new_password', '').strip()
+        if len(new_password) < 12:
+            messages.error(request, 'Password must be at least 12 characters.')
             return redirect('accounts:admin_resident_detail', pk=pk)
         resident.set_password(new_password)
         resident.save()
