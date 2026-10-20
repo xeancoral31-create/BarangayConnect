@@ -10,6 +10,16 @@ from complaints.models import Complaint
 from announcements.models import Announcement
 from accounts.views import admin_required
 
+
+def _safe_csv_cell(value):
+    """Prevent spreadsheet formula execution in exported user-controlled cells."""
+    if value is None:
+        return ''
+    text = str(value)
+    if text.lstrip().startswith(('=', '+', '-', '@', '\t', '\r')):
+        return "'" + text
+    return text
+
 try:
     from reportlab.lib.pagesizes import letter, A4
     from reportlab.lib import colors
@@ -48,10 +58,11 @@ def export_residents_csv(request):
     residents = CustomUser.objects.filter(role='resident').order_by('-created_at')
     for r in residents:
         writer.writerow([
-            r.get_full_name(), r.username, r.email, r.phone,
+            *[_safe_csv_cell(value) for value in (r.get_full_name(), r.username, r.email, r.phone,
             r.get_gender_display(), r.get_civil_status_display(), r.barangay,
             r.get_account_status_display(),
             r.created_at.strftime('%Y-%m-%d %H:%M') if r.created_at else '',
+            )],
         ])
     return response
 
@@ -64,12 +75,12 @@ def export_requests_csv(request):
     writer.writerow(['Resident Name', 'Certificate Type', 'Purpose', 'Copies', 'Status', 'Date Submitted', 'Date Updated'])
     requests = CertificateRequest.objects.select_related('resident', 'certificate_type').order_by('-created_at')
     for req in requests:
-        writer.writerow([
+        writer.writerow([_safe_csv_cell(value) for value in [
             req.resident.get_full_name(), req.certificate_type.name,
             req.purpose, req.copies, req.get_status_display(),
             req.created_at.strftime('%Y-%m-%d %H:%M'),
             req.updated_at.strftime('%Y-%m-%d %H:%M'),
-        ])
+        ]])
     return response
 
 
@@ -81,12 +92,12 @@ def export_complaints_csv(request):
     writer.writerow(['Resident', 'Subject', 'Category', 'Status', 'Date Submitted', 'Date Updated'])
     complaints = Complaint.objects.select_related('resident').order_by('-created_at')
     for c in complaints:
-        writer.writerow([
+        writer.writerow([_safe_csv_cell(value) for value in [
             c.resident.get_full_name(), c.subject,
             c.get_category_display(), c.get_status_display(),
             c.created_at.strftime('%Y-%m-%d %H:%M'),
             c.updated_at.strftime('%Y-%m-%d %H:%M'),
-        ])
+        ]])
     return response
 
 
