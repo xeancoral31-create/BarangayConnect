@@ -15,4 +15,5 @@ The SQLite database is runtime data and must not be versioned. If a committed da
 Files containing government IDs, certificates, or complaint evidence should be stored in private storage and served only through authorized views. Do not expose the media directory as a public static directory in production. Validate uploads server-side and scan them where feasible.
 
 ## Deployment
+Run the automated checks in GitHub Actions and review their results before merging or deploying.
 Set HTTPS at the hosting platform, configure the exact allowed hostnames and CSRF origins, run `python manage.py check --deploy`, apply migrations, and run the automated test suite before release.
