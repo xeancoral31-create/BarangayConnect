@@ -136,9 +136,10 @@
                                     View
                                 </a>
                                 {% if a.status == 'draft' %}
-                                <a href="{% url 'announcements:admin_publish' a.pk %}" class="btn btn-sm btn-success py-0 px-2 fs-xs me-1">
-                                    Publish
-                                </a>
+                                <form method="post" action="{% url 'announcements:admin_publish' a.pk %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success py-0 px-2 fs-xs me-1">Publish</button>
+                                </form>
                                 {% endif %}
                                 <a href="{% url 'announcements:admin_edit' a.pk %}" class="btn btn-sm btn-outline-primary py-0 px-2 fs-xs me-1">
                                     Edit
