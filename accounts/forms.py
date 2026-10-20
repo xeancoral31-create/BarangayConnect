@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm as DjangoPasswordChangeForm
 from django.core.exceptions import ValidationError
 from .models import CustomUser, BarangayOfficial
+from .upload_validation import validate_document_upload, validate_image_upload
 
 
 class RegistrationForm(forms.ModelForm):
@@ -47,6 +48,9 @@ class RegistrationForm(forms.ModelForm):
         if password and confirm and password != confirm:
             raise ValidationError('Passwords do not match.')
         return cleaned_data
+
+    def clean_valid_id(self):
+        return validate_document_upload(self.cleaned_data.get('valid_id'))
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -96,6 +100,9 @@ class ProfileUpdateForm(forms.ModelForm):
             'profile_picture': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
         }
 
+    def clean_profile_picture(self):
+        return validate_image_upload(self.cleaned_data.get('profile_picture'))
+
 
 class PasswordChangeForm(DjangoPasswordChangeForm):
     old_password = forms.CharField(
@@ -110,6 +117,9 @@ class PasswordChangeForm(DjangoPasswordChangeForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm New Password'}),
         label='Confirm New Password'
     )
+
+    def clean_photo(self):
+        return validate_image_upload(self.cleaned_data.get('photo'))
 
 
 class AdminCreateResidentForm(forms.ModelForm):
