@@ -51,21 +51,20 @@ def reports_dashboard(request):
 
 @admin_required
 def export_residents_csv(request):
-    response = HttpResponse(content_type='text/csv')
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
     response['Content-Disposition'] = 'attachment; filename="residents_report.csv"'
     writer = csv.writer(response)
     writer.writerow(['Full Name', 'Username', 'Email', 'Phone', 'Gender', 'Civil Status', 'Barangay', 'Status', 'Date Registered'])
     residents = CustomUser.objects.filter(role='resident').order_by('-created_at')
-    for r in residents:
-        writer.writerow([
-            *[_safe_csv_cell(value) for value in (r.get_full_name(), r.username, r.email, r.phone,
-            r.get_gender_display(), r.get_civil_status_display(), r.barangay,
-            r.get_account_status_display(),
-            r.created_at.strftime('%Y-%m-%d %H:%M') if r.created_at else '',
-            )],
-        ])
+    for resident in residents:
+        row = [
+            resident.get_full_name(), resident.username, resident.email, resident.phone,
+            resident.get_gender_display(), resident.get_civil_status_display(), resident.barangay,
+            resident.get_account_status_display(),
+            resident.created_at.strftime('%Y-%m-%d %H:%M') if resident.created_at else '',
+        ]
+        writer.writerow([_safe_csv_cell(value) for value in row])
     return response
-
 
 @admin_required
 def export_requests_csv(request):
