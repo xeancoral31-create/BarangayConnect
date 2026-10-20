@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.db.models import Q
 from django.http import HttpResponseForbidden
@@ -22,7 +24,7 @@ def admin_required(view_func):
     def wrapper(request, *args, **kwargs):
         if not request.user.is_authenticated:
             return redirect('accounts:login')
-        if not request.user.is_admin():
+        if not request.user.is_active or not request.user.is_admin():
             return render(request, 'errors/403.html', status=403)
         return view_func(request, *args, **kwargs)
     return wrapper
@@ -266,6 +268,11 @@ def admin_reset_password(request, pk):
         new_password = request.POST.get('new_password', '').strip()
         if len(new_password) < 12:
             messages.error(request, 'Password must be at least 12 characters.')
+            return redirect('accounts:admin_resident_detail', pk=pk)
+        try:
+            validate_password(new_password, user=resident)
+        except ValidationError as error:
+            messages.error(request, ' '.join(error.messages))
             return redirect('accounts:admin_resident_detail', pk=pk)
         resident.set_password(new_password)
         resident.save()
