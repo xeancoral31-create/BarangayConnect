@@ -27,6 +27,12 @@ class NotificationMethodTests(TestCase):
         self.notification.refresh_from_db()
         self.assertFalse(self.notification.is_read)
 
+    def test_mark_single_read_rejects_get(self):
+        response = self.client.get(reverse('notifications:mark_read', args=[self.notification.pk]))
+        self.assertEqual(response.status_code, 405)
+        self.notification.refresh_from_db()
+        self.assertFalse(self.notification.is_read)
+
     def test_mark_all_read_rejects_get(self):
         response = self.client.get(reverse('notifications:mark_all_read'))
         self.assertEqual(response.status_code, 405)
