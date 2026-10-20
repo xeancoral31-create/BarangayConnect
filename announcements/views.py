@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.core.paginator import Paginator
+from django.views.decorators.http import require_POST
 from .models import Announcement
 from .forms import AnnouncementForm
 from accounts.views import admin_required
@@ -96,6 +97,7 @@ def admin_announcement_delete(request, pk):
 
 
 @admin_required
+@require_POST
 def admin_announcement_publish(request, pk):
     announcement = get_object_or_404(Announcement, pk=pk)
     announcement.status = 'published'
@@ -115,6 +117,7 @@ def admin_announcement_publish(request, pk):
 
 
 @admin_required
+@require_POST
 def admin_announcement_archive(request, pk):
     announcement = get_object_or_404(Announcement, pk=pk)
     announcement.status = 'archived'

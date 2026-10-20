@@ -1,5 +1,6 @@
 from django import forms
 from .models import CertificateType, CertificateRequest
+from accounts.upload_validation import validate_document_upload
 
 
 class CertificateRequestForm(forms.ModelForm):
@@ -19,6 +20,9 @@ class CertificateRequestForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['certificate_type'].queryset = CertificateType.objects.filter(is_active=True)
 
+    def clean_supporting_document(self):
+        return validate_document_upload(self.cleaned_data.get('supporting_document'))
+
 
 class AdminCertificateStatusForm(forms.ModelForm):
     class Meta:
@@ -29,6 +33,9 @@ class AdminCertificateStatusForm(forms.ModelForm):
             'remarks': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'approved_document': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*,.pdf'}),
         }
+
+    def clean_approved_document(self):
+        return validate_document_upload(self.cleaned_data.get('approved_document'))
 
 
 class CertificateTypeForm(forms.ModelForm):

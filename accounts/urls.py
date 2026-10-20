@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, document_views
 
 app_name = 'accounts'
 
@@ -10,6 +10,7 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('profile/edit/', views.profile_edit_view, name='profile_edit'),
     path('profile/change-password/', views.change_password_view, name='change_password'),
+    path('private-document/<str:kind>/<int:pk>/', document_views.private_document, name='private_document'),
     # Admin: Residents
     path('admin/residents/', views.admin_residents_list, name='admin_residents_list'),
     path('admin/residents/create/', views.admin_resident_create, name='admin_resident_create'),

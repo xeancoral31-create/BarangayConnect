@@ -168,13 +168,9 @@
                                     <i class="bi bi-eye"></i> View
                                 </a>
                                 {% if r.account_status == 'pending' %}
-                                <a href="{% url 'accounts:admin_approve_resident' r.pk %}" class="btn btn-sm btn-success py-0 px-2 fs-xs me-1">
-                                    Approve
-                                </a>
+                                <form method="post" action="{% url 'accounts:admin_approve_resident' r.pk %}" class="d-inline">{% csrf_token %}<button type="submit" class="btn btn-sm btn-success py-0 px-2 fs-xs me-1">Approve</button></form>
                                 {% elif r.account_status == 'active' %}
-                                <a href="{% url 'accounts:admin_deactivate_resident' r.pk %}" class="btn btn-sm btn-outline-danger py-0 px-2 fs-xs" onclick="return confirm('Deactivate this resident account?');">
-                                    Deactivate
-                                </a>
+                                <form method="post" action="{% url 'accounts:admin_deactivate_resident' r.pk %}" class="d-inline" onsubmit="return confirm('Deactivate this resident account?');">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2 fs-xs">Deactivate</button></form>
                                 {% elif r.account_status == 'inactive' %}
                                 <a href="{% url 'accounts:admin_activate_resident' r.pk %}" class="btn btn-sm btn-outline-success py-0 px-2 fs-xs">
                                     Activate
