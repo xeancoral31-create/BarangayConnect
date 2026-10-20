@@ -178,7 +178,7 @@
                     {% if resident.valid_id %}
                     <div>
                         <p class="fs-xs text-muted mb-3">Review the official ID document provided by the resident for identity verification.</p>
-                        <a href="{{ resident.valid_id.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <a href="{% url 'accounts:private_document' 'resident-id' resident.pk %}" target="_blank" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-box-arrow-up-right me-1"></i>Open Full Resolution Document
                         </a>
                     </div>
