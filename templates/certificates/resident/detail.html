@@ -156,7 +156,7 @@
                         {% if cert_request.supporting_document %}
                         <div class="col-12">
                             <span class="text-muted d-block fs-xs">Attached Document</span>
-                            <a href="{{ cert_request.supporting_document.url }}" target="_blank" class="btn btn-outline-primary btn-sm mt-1">
+                            <a href="{% url 'accounts:private_document' 'certificate-support' cert_request.pk %}" target="_blank" class="btn btn-outline-primary btn-sm mt-1">
                                 <i class="bi bi-paperclip me-1"></i>View Supporting File
                             </a>
                         </div>
