@@ -86,7 +86,6 @@ def login_view(request):
 
 
 @login_required
-@require_POST
 def logout_view(request):
     username = request.user.username
     log_activity(request.user, 'Logout', f'User logged out: {username}', request)
