@@ -118,9 +118,6 @@ class PasswordChangeForm(DjangoPasswordChangeForm):
         label='Confirm New Password'
     )
 
-    def clean_photo(self):
-        return validate_image_upload(self.cleaned_data.get('photo'))
-
 
 class AdminCreateResidentForm(forms.ModelForm):
     password = forms.CharField(
@@ -196,3 +193,7 @@ class BarangayOfficialForm(forms.ModelForm):
             'order': forms.NumberInput(attrs={'class': 'form-control'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+    def clean_photo(self):
+        return validate_image_upload(self.cleaned_data.get('photo'))
+
