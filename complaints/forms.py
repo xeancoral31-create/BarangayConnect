@@ -1,5 +1,6 @@
 from django import forms
 from .models import Complaint
+from accounts.upload_validation import validate_document_upload
 
 
 class ComplaintForm(forms.ModelForm):
@@ -15,6 +16,9 @@ class ComplaintForm(forms.ModelForm):
             'supporting_document': forms.FileInput(attrs={'class': 'form-control', 'accept': 'image/*,.pdf'}),
             'contact_preference': forms.Select(attrs={'class': 'form-select'}),
         }
+
+    def clean_supporting_document(self):
+        return validate_document_upload(self.cleaned_data.get('supporting_document'))
 
 
 class AdminComplaintResponseForm(forms.ModelForm):
