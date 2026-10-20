@@ -110,9 +110,10 @@
                         <p class="text-muted fs-sm mb-0">Alerts on certificate approvals, complaint hearings, and official announcements.</p>
                     </div>
                     {% if notifications %}
-                    <a href="{% url 'notifications:mark_all_read' %}" class="btn btn-outline-secondary btn-sm">
-                        <i class="bi bi-check2-all me-1"></i>Mark All Read
-                    </a>
+                    <form method="post" action="{% url 'notifications:mark_all_read' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-secondary btn-sm"><i class="bi bi-check2-all me-1"></i>Mark All Read</button>
+                    </form>
                     {% endif %}
                 </div>
 
